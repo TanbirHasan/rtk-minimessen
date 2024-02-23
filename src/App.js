@@ -30,14 +30,7 @@ function App() {
             </PublicRoute>
           }
         />
-        <Route
-          path="/inbox"
-          element={
-           
-              <Conversation />
-           
-          }
-        />
+        <Route path="/inbox" element={<Conversation />} />
         <Route
           path="/inbox/:id"
           element={

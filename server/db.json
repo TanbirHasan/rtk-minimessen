@@ -29,6 +29,12 @@
       "password": "$2a$10$SRD3dEbl37uyvnW5B.to9.eHhnLqtA2ZKLn.M.xiIMI8Rm7U3Ysiu",
       "name": "test3",
       "id": 5
+    },
+    {
+      "email": "sumit@learnwithsumit.com",
+      "password": "$2a$10$aPnoZs.524VdhsCYep/yvOsl7is.TtXEMAOkTvSu2Xw/K.yRowcbO",
+      "name": "sumit",
+      "id": 6
     }
   ],
   "conversations": [

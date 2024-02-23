@@ -9,11 +9,11 @@ import { Link } from "react-router-dom";
 export default function ChatItems() {
   const { user } = useSelector((state) => state.auth);
 
-  console.log('user',user)
-  
+  console.log("user", user);
+
   const { email } = user || {};
 
-  console.log('user email',email)
+  console.log("user email", email);
   const {
     data: conversation,
     isLoading,
@@ -31,17 +31,17 @@ export default function ChatItems() {
     content = <li className="m-2 text-center">No conversation found</li>;
   } else if (!isLoading && !isError && conversation.length > 0) {
     content = conversation.map((conversation) => {
-      const {name} = getPartnerInfo(conversation.users,email)
+      const { name } = getPartnerInfo(conversation.users, email);
       return (
         <li key={conversation.id}>
           <Link to={`/inbox/${conversation.id}`}>
-          <ChatItem
-            avatar="https://cdn.pixabay.com/photo/2018/09/12/12/14/man-3672010__340.jpg"
-            name={name}
-            lastMessage={conversation.message}
-            lastTime={moment(conversation.timestamp).fromNow}
-          /></Link>
-          
+            <ChatItem
+              avatar="https://cdn.pixabay.com/photo/2018/09/12/12/14/man-3672010__340.jpg"
+              name={name}
+              lastMessage={conversation.message}
+              lastTime={moment(conversation.timestamp).fromNow()}
+            />
+          </Link>
         </li>
       );
     });
