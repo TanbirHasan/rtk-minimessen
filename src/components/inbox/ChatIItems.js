@@ -7,13 +7,10 @@ import getPartnerInfo from "../../utils/getPartnerInfo";
 import { Link } from "react-router-dom";
 
 export default function ChatItems() {
-  const { user } = useSelector((state) => state.auth);
-
-  console.log("user", user);
+  const { user } = useSelector((state) => state.auth) || {};
 
   const { email } = user || {};
 
-  console.log("user email", email);
   const {
     data: conversation,
     isLoading,
@@ -22,7 +19,7 @@ export default function ChatItems() {
   } = useGetConversationQuery(email);
 
   // decide what to render
-  let content;
+  let content = null;
   if (isLoading) {
     content = <li className="m-2 text-center">loading</li>;
   } else if (!isLoading && isError) {
@@ -36,6 +33,7 @@ export default function ChatItems() {
         <li key={conversation.id}>
           <Link to={`/inbox/${conversation.id}`}>
             <ChatItem
+              id={conversation.id}
               avatar="https://cdn.pixabay.com/photo/2018/09/12/12/14/man-3672010__340.jpg"
               name={name}
               lastMessage={conversation.message}
