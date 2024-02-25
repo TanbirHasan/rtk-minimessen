@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { useGetConversationQuery } from "../../features/coversations/coversationsApi";
+import { useGetConversationsQuery } from "../../features/coversations/coversationsApi";
 import ChatItem from "./ChatItem";
 import Error from "../ui/Error";
 import moment from "moment";
@@ -16,7 +16,7 @@ export default function ChatItems() {
     isLoading,
     isError,
     error,
-  } = useGetConversationQuery(email);
+  } = useGetConversationsQuery(email);
 
   // decide what to render
   let content = null;
