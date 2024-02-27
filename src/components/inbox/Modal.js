@@ -1,11 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import isvalidateEmail from "../../utils/isValidEmail";
 import { useGetUserQuery } from "../../features/users/usersApi";
+import { useDispatch, useSelector } from "react-redux";
+import { conversationApi } from "../../features/coversations/coversationsApi";
 
 export default function Modal({ open, control }) {
   const [to, setTo] = useState("");
   const [skipOff, setSkipOff] = useState(false);
   const [message, setMessage] = useState("");
+  const { user: loggedInUser } = useSelector((state) => state.auth || {});
+  const { email } = loggedInUser || {};
+  const dispatch = useDispatch();
 
   const {
     data: participant,
@@ -14,6 +19,22 @@ export default function Modal({ open, control }) {
   } = useGetUserQuery(to, {
     skip: !skipOff,
   });
+
+  useEffect(() => {
+    if (to && participant !== undefined && participant?.length > 0 && participant[0]?.email !== email) {
+      console.log('participantemail', to);
+      // check conversation existence
+      dispatch(
+        conversationApi.endpoints.getConversation.initiate({
+          userEmail: email,
+          participantEmail: to,
+        })
+        
+      );
+    }
+  }, [participant]);
+  console.log('participantemail', to);
+  
 
   const debounceHandler = (fn, delay) => {
     let timeoutId;
@@ -33,6 +54,8 @@ export default function Modal({ open, control }) {
   };
 
   const handleSearch = debounceHandler(doSearch, 500);
+
+
 
   return (
     open && (
@@ -90,6 +113,11 @@ export default function Modal({ open, control }) {
             {participant?.length === 0 && (
               <span className="text-red-600 font-semibold">
                 This user doesn't exit
+              </span>
+            )}
+            {participant?.length > 0 && participant?.[0].email === email && (
+              <span className="text-red-600 font-semibold">
+                You can't send message to yourself
               </span>
             )}
             {/* <Error message="There was an error" /> */}
