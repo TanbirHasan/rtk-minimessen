@@ -9,6 +9,7 @@ import PublicRoute from "./components/PublicRoute/PublicRoute";
 
 function App() {
   const authChecked = useAuthCheck();
+
   return !authChecked ? (
     <div>Checking authentication...</div>
   ) : (

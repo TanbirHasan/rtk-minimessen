@@ -7,6 +7,8 @@ import { conversationApi } from "../../features/coversations/coversationsApi";
 export default function Modal({ open, control }) {
   const [to, setTo] = useState("");
   const [skipOff, setSkipOff] = useState(false);
+  const [responseError,setResponseError] = useState('')
+  const [conversation,setConversation] = useState(undefined)
   const [message, setMessage] = useState("");
   const { user: loggedInUser } = useSelector((state) => state.auth || {});
   const { email } = loggedInUser || {};
@@ -30,10 +32,10 @@ export default function Modal({ open, control }) {
           participantEmail: to,
         })
         
-      );
+      ).unwrap().then(data => setConversation(data[0])).catch(err => setResponseError('There was an error'))
     }
-  }, [participant]);
-  console.log('participantemail', to);
+  }, [participant,dispatch,email,to]);
+
   
 
   const debounceHandler = (fn, delay) => {
@@ -55,6 +57,10 @@ export default function Modal({ open, control }) {
 
   const handleSearch = debounceHandler(doSearch, 500);
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+  }
+
 
 
   return (
@@ -68,7 +74,7 @@ export default function Modal({ open, control }) {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Send message
           </h2>
-          <form className="mt-8 space-y-6">
+          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
                 <label htmlFor="to" className="sr-only">
@@ -104,6 +110,7 @@ export default function Modal({ open, control }) {
             <div>
               <button
                 type="submit"
+                disabled={conversation === undefined || (participant?.length > 0 && participant?.[0].email === email)}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
               >
                 Send Message
@@ -120,6 +127,9 @@ export default function Modal({ open, control }) {
                 You can't send message to yourself
               </span>
             )}
+            {
+              responseError && <span className="text-red-600 font-semibold">{responseError}</span>
+            }
             {/* <Error message="There was an error" /> */}
           </form>
         </div>

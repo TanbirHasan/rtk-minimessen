@@ -14,13 +14,13 @@ export default function useAuthCheck() {
         dispatch(
           userLoggedIn({
             accessToken: auth?.accessToken,
-            user: auth?.auth?.user,
+            user: auth?.user,
           })
         );
       }
     }
     setAuthChecked(true);
-  }, [dispatch]);
+  }, [dispatch,setAuthChecked]);
 
   return authChecked;
 }
