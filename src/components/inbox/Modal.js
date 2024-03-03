@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import isvalidateEmail from "../../utils/isValidEmail";
 import { useGetUserQuery } from "../../features/users/usersApi";
 import { useDispatch, useSelector } from "react-redux";
-import { conversationApi } from "../../features/coversations/coversationsApi";
+import { conversationApi, useAddConversationMutation, useEditConversationMutation } from "../../features/coversations/coversationsApi";
 
 export default function Modal({ open, control }) {
   const [to, setTo] = useState("");
@@ -21,6 +21,9 @@ export default function Modal({ open, control }) {
   } = useGetUserQuery(to, {
     skip: !skipOff,
   });
+
+  const [addConversation,{isSuccess:isPostSuccess,isLoading:postLoading,isError:postError}] = useAddConversationMutation()
+  const [editConversation, {isSuccess:isEditSuccess}] = useEditConversationMutation()
 
   useEffect(() => {
     if (to && participant !== undefined && participant?.length > 0 && participant[0]?.email !== email) {
@@ -55,13 +58,38 @@ export default function Modal({ open, control }) {
     }
   };
 
+  console.log('Message',message,conversation)
+
   const handleSearch = debounceHandler(doSearch, 500);
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
+
+    if(Object.keys(conversation).length !== 0){
+      editConversation({id:conversation.id,data:{
+        participants : `${email}-${participant[0].email}`,
+        users : [loggedInUser,participant[0]],
+        message,
+        timestamp : new Date().getTime()
+      }})
+
+    }
+    else{
+      addConversation({
+        participants : `${email}-${participant[0].email}`,
+        users : [loggedInUser,participant[0]],
+        message,
+        timestamp : new Date().getTime()
+      })
+    }
   }
 
 
+  useEffect(() => {
+    if(isPostSuccess || isEditSuccess){
+      control()
+    }
+  },[isEditSuccess,isPostSuccess])
 
   return (
     open && (
@@ -99,7 +127,7 @@ export default function Modal({ open, control }) {
                   name="message"
                   type="text"
                   value={message}
-                  onChange={(e) => setMessage(e.target.message)}
+                  onChange={(e) => setMessage(e.target.value)}
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-violet-500 focus:border-violet-500 focus:z-10 sm:text-sm"
                   placeholder="Message"

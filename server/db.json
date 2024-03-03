@@ -50,17 +50,18 @@
       "users": [
         {
           "email": "sumit@learnwithsumit.com",
-          "name": "Sumit Saha",
-          "id": 1
+          "name": "sumit",
+          "id": 7
         },
         {
           "email": "akash@learnwithsumit.com",
-          "name": "Akash Ahmed",
-          "id": 2
+          "password": "$2a$10$SRD3dEbl37uyvnW5B.to9.eHhnLqtA2ZKLn.M.xiIMI8Rm7U3Ysiu",
+          "name": "akash",
+          "id": 6
         }
       ],
-      "message": "How are you?",
-      "timestamp": 1661976143678
+      "message": "redux is awesome!",
+      "timestamp": 1709453989698
     },
     {
       "id": 2,
