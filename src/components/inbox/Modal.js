@@ -76,10 +76,13 @@ export default function Modal({ open, control }) {
     }
     else{
       addConversation({
-        participants : `${email}-${participant[0].email}`,
-        users : [loggedInUser,participant[0]],
-        message,
-        timestamp : new Date().getTime()
+        sender : email,
+        data : {
+          participants : `${email}-${participant[0].email}`,
+          users : [loggedInUser,participant[0]],
+          message,
+          timestamp : new Date().getTime()
+        }
       })
     }
   }
