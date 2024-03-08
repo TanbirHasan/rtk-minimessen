@@ -78,7 +78,7 @@ export default function Modal({ open, control }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (Object.keys(conversation).length !== 0 && conversation !== undefined) {
+    if (conversation) {
       editConversation({
         id: conversation?.id,
         sender: email,
