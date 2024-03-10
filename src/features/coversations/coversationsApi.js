@@ -1,3 +1,4 @@
+import { io } from "socket.io-client";
 import { apiSlice } from "../api/apiSlice";
 import { messageApi } from "../messages/messagesApi";
 
@@ -11,6 +12,43 @@ export const conversationApi = apiSlice.injectEndpoints({
     getConversation: builder.query({
       query: ({ userEmail, participantEmail }) =>
         `/conversations?participants_like=${userEmail}-${participantEmail}&&participants_like=${participantEmail}-${userEmail}`,
+        async onCacheEntryAdded(arg,{
+          updateCachedData,cacheDataLoaded,cacheEntryRemoved
+        }){
+          // create socket
+          const socket = io('http://localhost:9000',{
+            reconnectionDelay : 1000,
+            reconnection : true,
+            reconnectionAttempts : 10,
+            transports : ['websocket'],
+            agent : false,
+            upgrade : false,
+            rejectUnauthorized : false,
+          })
+
+          try{
+            await cacheDataLoaded;
+            socket.on("conversation",(data) => {
+              updateCachedData(draft =>{
+                const draftConversation = draft.find(c => c.id == data?.data.id);
+                if(draftConversation?.id){
+                  draftConversation.message = data?.data.message;
+                  draftConversation.timestamp = data?.data.timestamp;
+
+                }
+                else{
+                  
+
+                }
+              })
+
+            })
+
+          }
+          catch(err){}
+
+        }
+      
     }),
     addConversation: builder.mutation({
       query: ({ sender, data }) => ({
