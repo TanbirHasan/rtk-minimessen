@@ -4,8 +4,14 @@ const express = require('express')
 const http = require('http');
 
 
+
+
 const app = express()
 const server = http.createServer(app);
+const io = require('socket.io')(server)
+
+// for using the io in all file
+global.io = io;
 const router = jsonServer.router("db.json");
 const middlewares = jsonServer.defaults();
 const port = process.env.PORT || 9000;
