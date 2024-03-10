@@ -38,28 +38,59 @@ export const conversationApi = apiSlice.injectEndpoints({
       },
     }),
     editConversation: builder.mutation({
-      query: ({ id, data, sender }) => ({
+      query: ({ id,sender, data }) => ({
         url: `/conversations/${id}`,
         method: "PATCH",
         body: data,
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
-        const conversation = await queryFulfilled;
-        if (conversation?.data.id) {
-          // silent entry to message table
-          const users = arg.data.users;
-          const senderUser = users?.find((user) => user.email === arg.sender);
-          const receiverUser = users?.find((user) => user.email !== arg.sender);
-          dispatch(
-            messageApi.endpoints.addMessage.initiate({
-              conversationId: conversation?.data.id,
-              sender: senderUser,
-              receiver: receiverUser,
-              message: arg.data.message,
-              timestamp: arg.data.timestamp,
-            })
-          );
+        // optimistic cache update start
+        const patchResult = dispatch(
+          apiSlice.util.updateQueryData("getConversations",arg.sender,(draft) => {
+            const draftConversation = draft.find(c => c.id == arg.id);
+            draftConversation.message = arg.data.message;
+            draftConversation.timestamp = arg.data.timestamp;
+  
+          })
+        )
+        
+
+        // optimistic cache update end
+
+        try{
+          const conversation = await queryFulfilled;
+          if (conversation?.data.id) {
+            // silent entry to message table
+            const users = arg.data.users;
+            const senderUser = users?.find((user) => user.email === arg.sender);
+            const receiverUser = users?.find((user) => user.email !== arg.sender);
+            const res = await dispatch(
+              messageApi.endpoints.addMessage.initiate({
+                conversationId: conversation?.data.id,
+                sender: senderUser,
+                receiver: receiverUser,
+                message: arg.data.message,
+                timestamp: arg.data.timestamp,
+              })
+            ).unwrap()
+            
+
+            // pesimistic update of messages cache
+            dispatch(
+              apiSlice.util.updateQueryData("getMessages",res.conversationId.toString(),(draft) => {
+                draft.push(res);
+                
+      
+              })
+            )
+            // pesimistic update of messages cache end
+          }
         }
+        catch(err){
+          patchResult.undo()
+
+        }
+       
       },
     }),
   }),
