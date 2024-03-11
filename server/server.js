@@ -22,7 +22,12 @@ router.render = (req,res) => {
 
     if(path.includes('/conversations') && ((method === 'POST') || (method === 'PATCH') )){
         io.emit("conversation",{
-            data : res.locals.data
+          data : res.locals.data
+        })
+    }
+    if(path.includes("/messages") && (method === 'POST')){
+        io.emit("message",{
+            data: res.locals.data
         })
     }
     res.json(
