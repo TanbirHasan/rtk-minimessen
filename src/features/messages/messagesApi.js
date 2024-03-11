@@ -31,11 +31,11 @@ export const messageApi = apiSlice.injectEndpoints({
               console.log("conversation", draftConversation);
               if (draftConversation?.id) {
                 // Dispatch the addMessage mutation with the new message data
-                dispatch(messageApi.endpoints.addMessage.initiate(
+                dispatch(messageApi.endpoints.addMessage.mutation(
                   {
                     conversationId: data?.data.coversationId,
                     sender: data?.data.sender.email,
-                    receiver: data?.data?.revceiver.email,
+                    receiver: data?.data?.receiver.email,
                     message: data?.data.message,
                     timestamp: data?.data.timestamp,
                   }
