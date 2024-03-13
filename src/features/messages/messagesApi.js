@@ -23,15 +23,15 @@ export const messageApi = apiSlice.injectEndpoints({
         try {
           await cacheDataLoaded;
           socket.on("message", (data) => {
-            console.log("messageData", data);
+            console.log("messageData", data?.data);
             updateCachedData((draft) => {
               const draftConversation = draft.find(
                 (c) => c.id == data?.data?.id
               );
-              console.log("conversation", draftConversation);
-              if (draftConversation?.id) {
+              console.log("conversation for message", draftConversation);
+              if (draftConversation) {
                 // Dispatch the addMessage mutation with the new message data
-                dispatch(messageApi.endpoints.addMessage.mutation(
+                dispatch(messageApi.endpoints.addMessage.initiate(
                   {
                     conversationId: data?.data.coversationId,
                     sender: data?.data.sender.email,
