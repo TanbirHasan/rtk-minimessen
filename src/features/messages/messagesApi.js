@@ -25,8 +25,14 @@ export const messageApi = apiSlice.injectEndpoints({
           socket.on("message", (data) => {
             console.log("messageData", data?.data);
             updateCachedData((draft) => {
+           
+              const obj = { ...draft };
+              console.log("message draft",obj)
               const draftConversation = draft.find(
-                (c) => c.id == data?.data?.id
+                (c) =>{ 
+                  const innerObj = { ...c };
+                  console.log('innerOBj',innerObj)
+                  return c.id === data?.data?.id}
               );
               console.log("conversation for message", draftConversation);
               if (draftConversation) {

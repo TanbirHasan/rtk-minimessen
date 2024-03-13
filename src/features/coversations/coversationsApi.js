@@ -29,7 +29,10 @@ export const conversationApi = apiSlice.injectEndpoints({
             updateCachedData((draft) => {
               console.log('draft',draft)
               const draftConversation = draft.find(
-                (c) => c.id == data?.data?.id
+                (c) => { 
+                  const innerObj = { ...c };
+                  console.log('innerOBj conversation',innerObj)
+                  return c.id == data?.data?.id}
               );
               console.log('conversation',draftConversation)
               if (draftConversation?.id) {
