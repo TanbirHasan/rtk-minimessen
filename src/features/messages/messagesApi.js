@@ -8,7 +8,7 @@ export const messageApi = apiSlice.injectEndpoints({
         `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=1&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
       async onCacheEntryAdded(
         arg,
-        { updateCachedData, cacheDataLoaded, dispatch }
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
       ) {
         // create socket
         const socket = io("http://localhost:9000", {
@@ -21,37 +21,37 @@ export const messageApi = apiSlice.injectEndpoints({
           rejectUnauthorized: false,
         });
         try {
-          await cacheDataLoaded;
+          const res = await cacheDataLoaded;
+          console.log("cache data loaded", res);
           socket.on("message", (data) => {
             console.log("messageData", data?.data);
             updateCachedData((draft) => {
-           
-              const obj = { ...draft };
-              console.log("message draft",obj)
-              const draftConversation = draft.find(
-                (c) =>{ 
-                  const innerObj = { ...c };
-                  console.log('innerOBj',innerObj)
-                  return c.id === data?.data?.id}
-              );
-              console.log("conversation for message", draftConversation);
+              const draftConversation = draft.find((c) => {
+                const innerObj = { ...c };
+                console.log("innerOBj", innerObj);
+                console.log(
+                  "checking matching id",
+                  innerObj.conversationId == arg
+                );
+                return innerObj.conversationId == data?.data?.conversationId;
+              });
+
               if (draftConversation) {
-                // Dispatch the addMessage mutation with the new message data
-                dispatch(messageApi.endpoints.addMessage.initiate(
-                  {
-                    conversationId: data?.data.coversationId,
-                    sender: data?.data.sender.email,
-                    receiver: data?.data?.receiver.email,
-                    message: data?.data.message,
-                    timestamp: data?.data.timestamp,
-                  }
-                ))
-                ;// Dispatching the mutation directly
+                draft.push({
+                  conversationId : arg || data?.data?.conversationId,
+                  sender: data?.data?.sender,
+                  receiver: data?.data?.receiver,
+                  message: data?.data.message,
+                  timestamp: data?.data.timestamp,
+                });
+
               }
             });
           });
         } catch (err) {
           console.error("Error in cacheDataLoaded:", err);
+          await cacheEntryRemoved;
+          socket.close();
         }
       },
     }),

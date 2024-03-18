@@ -10,7 +10,7 @@ export default function Messages({ messages = [] }) {
       <ul className="space-y-2">
         {messages.slice().sort((a,b) => a.timestamp - b.timestamp).map((message) => {
           const { message: lastMessage, id, sender } = message || {};
-          const justify = sender.email !== email ? "start" : "end";
+          const justify = sender?.email !== email ? "start" : "end";
           return <Message key={id} justify={justify} message={lastMessage} />;
         })}
       </ul>
