@@ -7,6 +7,16 @@ export const conversationApi = apiSlice.injectEndpoints({
     getConversations: builder.query({
       query: (email) =>
         `/conversations?participants_like=${email}&_sort=timestamp&_order=desc&_page=1&_limit=${process.env.REACT_APP_CONVERSATION_PER_PAGE}`,
+        transformResponse(apiResponse,meta){
+    
+          const totalCount = meta?.response.headers.get('X-Total-Count');
+      
+          return {
+            data : apiResponse,
+            totalCount
+          };
+
+        },
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
@@ -48,6 +58,41 @@ export const conversationApi = apiSlice.injectEndpoints({
         socket.close();
       },
     }),
+    getMoreConversations: builder.query({
+      query: ({email,page}) =>
+        `/conversations?participants_like=${email}&_sort=timestamp&_order=desc&_page=${page}&_limit=${process.env.REACT_APP_CONVERSATION_PER_PAGE}`,
+        async onQueryStarted({email}, { queryFulfilled, dispatch }) {
+          // optimistic cache update start
+          
+  
+          // optimistic cache update end
+  
+          try {
+            const conversations = await queryFulfilled;
+            if (conversations?.data.length) {
+             
+  
+              // pesimistic update of messages cache
+              dispatch(
+                apiSlice.util.updateQueryData(
+                  "getConversations",
+                  email,
+                  (draft) => {
+                    return {
+                      data : [...draft.data, ...conversations.data],
+                      totalCount : Number(draft.totalCount)
+                    }
+                  }
+                )
+              );
+              // pesimistic update of messages cache end
+            }
+          } catch (err) {
+            console.log(err)
+          }
+        },
+    }),
+
 
     getConversation: builder.query({
       query: ({ userEmail, participantEmail }) =>
@@ -91,7 +136,7 @@ export const conversationApi = apiSlice.injectEndpoints({
             "getConversations",
             arg.sender,
             (draft) => {
-              const draftConversation = draft.find((c) => c.id == arg.id);
+              const draftConversation = draft?.data.find((c) => c.id == arg.id);
               draftConversation.message = arg.data.message;
               draftConversation.timestamp = arg.data.timestamp;
             }

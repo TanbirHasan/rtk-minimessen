@@ -8,8 +8,9 @@ export const messageApi = apiSlice.injectEndpoints({
         `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=1&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
       async onCacheEntryAdded(
         arg,
-        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch }
+        { updateCachedData, cacheDataLoaded, cacheEntryRemoved, dispatch,getState }
       ) {
+        console.log('state',getState())
         // create socket
         const socket = io("http://localhost:9000", {
           reconnectionDelay: 1000,
@@ -37,13 +38,22 @@ export const messageApi = apiSlice.injectEndpoints({
               });
 
               if (draftConversation) {
-                draft.push({
+       
+                let newDraft = [{
                   conversationId : arg || data?.data?.conversationId,
                   sender: data?.data?.sender,
                   receiver: data?.data?.receiver,
                   message: data?.data.message,
                   timestamp: data?.data.timestamp,
-                });
+                }]
+                // draft.push({
+                //   conversationId : arg || data?.data?.conversationId,
+                //   sender: data?.data?.sender,
+                //   receiver: data?.data?.receiver,
+                //   message: data?.data.message,
+                //   timestamp: data?.data.timestamp,
+                // });
+                return [...draft,...newDraft]
 
               }
             });
