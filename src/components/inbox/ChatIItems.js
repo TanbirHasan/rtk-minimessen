@@ -19,8 +19,6 @@ export default function ChatItems() {
   const fetchMore = () => {
     setPage(prev => prev+1)
   }
-
-
   const { email } = user || {};
 
   const {

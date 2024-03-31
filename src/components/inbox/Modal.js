@@ -41,7 +41,7 @@ export default function Modal({ open, control }) {
       participant[0]?.email !== email
     ) {
       console.log("participantemail", to);
-      // check conversation existence
+      // check conversation existence for rendring the conversation
       dispatch(
         conversationApi.endpoints.getConversation.initiate({
           userEmail: email,
